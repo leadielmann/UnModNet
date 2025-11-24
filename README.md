@@ -19,6 +19,82 @@ source finetuning/bin/activate  # On Windows: finetuning\Scripts\activate
 pip install torch torchvision numpy opencv-python Pillow tqdm matplotlib scikit-image
 ```
 
+## Running the Pipeline
+
+### 1. Convert Images to .npy Format
+```bash
+python convert_jpeg_to_npy.py \
+  --input_dir ~/datasets/imagenette/train \
+  --output_dir ../data/converted/train
+
+python convert_jpeg_to_npy.py \
+  --input_dir ~/datasets/imagenette/val \
+  --output_dir ../data/converted/val
+```
+
+### 2. Process Dataset with Modulo Simulation
+```bash
+python process_all_classes.py \
+  --input_dir ../data/converted/train \
+  --train_dir ../data/processed/train \
+  --test_dir ../data/processed/test \
+  --training_sample_per_class 640 \
+  --n_cut 5
+```
+
+### 3. Generate Edge Maps
+```bash
+for class in n01440764 n02102040 n02979186 n03000684 n03028079 n03394916 n03417042 n03425413 n03445777 n03888257; do
+  python scripts/make_edge_map.py --data_dir ../data/processed/train/$class
+done
+```
+
+### 4. Train Edge Module
+```bash
+python execute/train.py -c config/edge_module_finetune.json
+```
+
+### 5. Train Mask Module
+```bash
+python execute/train.py -c config/mask_module_finetune.json
+```
+
+### 6. Process Validation Set (Full-Size)
+```bash
+python process_full_size.py \
+  --input_dir ../data/converted/val \
+  --output_dir ../data/processed_fullsize/val
+
+for class in n01440764 n02102040 n02979186 n03000684 n03028079 n03394916 n03417042 n03425413 n03445777 n03888257; do
+  python scripts/make_edge_map.py --data_dir ../data/processed_fullsize/val/$class
+done
+```
+
+### 7. Run Reconstruction
+```bash
+EDGE_MODEL=$(find ../experiments/edge_module -name "model_best.pth")
+MASK_MODEL=$(find ../experiments/mask_module -name "model_best.pth")
+
+python execute/infer_LearnMaskNet_fixed.py \
+  --resume "$MASK_MODEL" \
+  --resume_edge_module "$EDGE_MODEL" \
+  --data_dir ../data/processed_fullsize/val \
+  --result_dir ../results/reconstructed_fullsize_val \
+  default \
+  --iter_max 15
+```
+
+### 8. Organize Results
+```bash
+python organize_results.py \
+  --data_dir ../data/processed_fullsize/val \
+  --result_dir ../results/reconstructed_fullsize_val \
+  --output_dir ../results/val_fullsize_by_class
+```
+
+Done! Reconstructed images are in `../results/val_fullsize_by_class/`.
+
+
 # UnModNet: Learning to Unwrap a Modulo Image for High Dynamic Range Imaging
 
 By [Chu Zhou](https://fourson.github.io/), Hang Zhao, Jin Han, Chang Xu, Chao Xu, Tiejun Huang, [Boxin Shi](http://ci.idm.pku.edu.cn/)
