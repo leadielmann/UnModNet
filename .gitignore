@@ -1,1 +1,62 @@
-others/
+cd ~/github/optimized_modulo_based_sensing/optimized_modulo_based_sensing/finetuning/UnModNet
+
+# Create .gitignore with echo
+cat > .gitignore << 'EOF'
+# Virtual environments
+finetuning/
+venv/
+env/
+
+# Data folders
+../data/
+../experiments/
+../results/
+../classification_datasets/
+../pretrained_models/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Backups
+*_original.py
+*_backup.py
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Logs
+*.log
+runs/
+
+# Unnecessary scripts
+visualize_dataset.py
+visualize_with_real_original.py
+visualize_reconstruction.py
+visualize_with_better_scaling.py
+quick_viz.py
+apply_tonemapping.py
+prepare_classification_datasets.py
+resize_for_classification.py
+test_dataloader.py
+test_gpu.py
+*.sh
+
+# Test configs
+config/edge_module_test.json
+config/mask_module_test.json
+
+# Model files
+*.pth
+*.pt
+!config/*.json
+EOF
+
+echo "✅ .gitignore created!"others/
