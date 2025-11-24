@@ -1,3 +1,24 @@
+# UnModNet Fine-tuning on Imagenette
+
+Fork of [original UnModNet](https://github.com/ORIGINAL_AUTHOR/UnModNet) with modifications for Imagenette dataset fine-tuning.
+
+## What's Different
+
+- Multi-class data loaders
+- Helper scripts for Imagenette processing
+- Full-size (512×512) reconstruction support
+- PyTorch 2.6 compatibility fixes
+
+## Setup / Quick Start
+```bash
+git clone https://github.com/leadielmann/UnModNet.git
+cd UnModNet
+python -m venv finetuning
+source finetuning/bin/activate  # On Windows: finetuning\Scripts\activate
+
+pip install torch torchvision numpy opencv-python Pillow tqdm matplotlib scikit-image
+```
+
 # UnModNet: Learning to Unwrap a Modulo Image for High Dynamic Range Imaging
 
 By [Chu Zhou](https://fourson.github.io/), Hang Zhao, Jin Han, Chang Xu, Chao Xu, Tiejun Huang, [Boxin Shi](http://ci.idm.pku.edu.cn/)
