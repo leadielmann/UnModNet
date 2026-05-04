@@ -42,6 +42,12 @@ def convert_images_to_npy(input_dir, output_dir, target_size=512):
                 
                 # Convert to numpy array and normalize to [0, 1]
                 img_array = np.array(img).astype(np.float32) / 255.0
+                # sRGB -> linear (undo display gamma so values approximate scene radiance)
+                img_array = np.where(
+                    img_array <= 0.04045,
+                    img_array / 12.92,
+                    ((img_array + 0.055) / 1.055) ** 2.4,
+                ).astype(np.float32)
                 
                 # Verify shape
                 assert img_array.shape == (target_size, target_size, 3), f"Unexpected shape: {img_array.shape}"
